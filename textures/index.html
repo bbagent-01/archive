@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brightbase Texture Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   BRIGHTBASE TEXTURE LAB — Dark Creative UI
+   ════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0B;--surface:#111113;--panel:#1A1A1E;--border:#2A2A2E;--border-hi:#3A3A3E;
+  --text:#E5E5E5;--text2:#999;--text3:#666;
+  --accent:#E85D2A;--accent-hover:#F2734A;--accent-dim:rgba(232,93,42,0.15);
+  --ember:#8B1A00;--crimson:#D44A1A;--coral:#E85D2A;--tangerine:#F2734A;
+  --peach:#F5A173;--amber:#F0B95D;--honey:#F5D89A;--cream:#FFF0E5;
+  --deep-blue:#062A40;--ocean:#0A4A6E;--teal:#2A7A72;--neon-green:#00FF88;
+  --radius:6px;--transition:all 0.15s ease;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── Header ── */
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);height:48px;flex-shrink:0}
+.header h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px}
+.header h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.header-right{display:flex;align-items:center;gap:12px}
+.size-select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:var(--radius);font-size:12px;font-family:'JetBrains Mono',monospace;cursor:pointer}
+.size-select:focus{outline:none;border-color:var(--accent)}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:2px;padding:6px 20px;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.tab{padding:7px 14px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--text2);transition:var(--transition);white-space:nowrap;letter-spacing:0.01em}
+.tab:hover{color:var(--text);background:var(--panel)}
+.tab.active{color:var(--accent);background:var(--accent-dim)}
+
+/* ── Workspace ── */
+.workspace{display:flex;flex:1;overflow:hidden}
+.preview{flex:1;display:flex;align-items:center;justify-content:center;background:var(--surface);padding:20px;position:relative;overflow:hidden}
+.preview canvas{max-width:100%;max-height:100%;border-radius:4px;display:block}
+
+/* ── Controls Panel ── */
+.controls{width:300px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--bg)}
+.controls-scroll{flex:1;overflow-y:auto;padding:16px}
+.controls-scroll::-webkit-scrollbar{width:4px}
+.controls-scroll::-webkit-scrollbar-track{background:transparent}
+.controls-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.controls-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+
+/* ── Control Groups ── */
+.ctrl-group{margin-bottom:16px}
+.ctrl-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.ctrl-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)}
+.ctrl-row{display:flex;gap:8px;align-items:center}
+
+/* ── Slider ── */
+input[type="range"]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+input[type="range"]::-webkit-slider-thumb:hover{background:var(--accent-hover);transform:scale(1.1)}
+
+/* ── Color Input ── */
+.color-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.color-row input[type="color"]{-webkit-appearance:none;width:28px;height:28px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;padding:0;background:none}
+.color-row input[type="color"]::-webkit-color-swatch-wrapper{padding:1px}
+.color-row input[type="color"]::-webkit-color-swatch{border:none;border-radius:3px}
+.color-row span{font-size:11px;color:var(--text2)}
+
+/* ── Buttons ── */
+.btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:'DM Sans',sans-serif;flex:1;text-align:center}
+.btn:hover{border-color:var(--border-hi);background:var(--border)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+
+/* ── Toggle Group ── */
+.toggle-group{display:flex;gap:1px;background:var(--panel);border-radius:var(--radius);padding:2px;border:1px solid var(--border)}
+.toggle-btn{padding:5px 10px;border-radius:4px;border:none;background:transparent;color:var(--text3);font-size:11px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:'DM Sans',sans-serif}
+.toggle-btn:hover{color:var(--text2)}
+.toggle-btn.active{background:var(--border);color:var(--text)}
+
+/* ── Preset Swatches ── */
+.presets{display:flex;flex-wrap:wrap;gap:4px}
+.preset{width:36px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:var(--transition);position:relative;overflow:hidden}
+.preset:hover{border-color:var(--border-hi)}
+.preset.active{border-color:var(--accent)}
+
+/* ── Section Divider ── */
+.ctrl-divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Checkbox Row ── */
+.check-row{display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer}
+.check-row input[type="checkbox"]{accent-color:var(--accent);cursor:pointer}
+.check-row label{font-size:12px;cursor:pointer;user-select:none}
+
+/* ── Compositor Layer ── */
+.layer-item{display:flex;align-items:center;gap:8px;padding:8px;background:var(--panel);border-radius:var(--radius);margin-bottom:6px;border:1px solid var(--border)}
+.layer-item.disabled{opacity:0.4}
+.layer-name{font-size:12px;font-weight:500;flex:1}
+.layer-opacity{width:60px}
+.layer-blend{background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:10px;padding:3px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .controls{width:260px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="dot"></span>BRIGHTBASE TEXTURE LAB</h1>
+  <div class="header-right">
+    <select class="size-select" id="canvasSize">
+      <option value="1920x1080">1920 x 1080</option>
+      <option value="1080x1080">1080 x 1080</option>
+      <option value="1080x1920">1080 x 1920</option>
+      <option value="2560x1440">2560 x 1440</option>
+      <option value="3840x2160">3840 x 2160</option>
+    </select>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-tab="mesh">Mesh Gradient</button>
+  <button class="tab" data-tab="glass">Ribbed Glass</button>
+  <button class="tab" data-tab="grain">Film Grain</button>
+  <button class="tab" data-tab="halftone">Halftone</button>
+  <button class="tab" data-tab="chrome">Sunset</button>
+  <button class="tab" data-tab="bands">Color Bands</button>
+  <button class="tab" data-tab="waves">Wavy Lines</button>
+  <button class="tab" data-tab="orbs">Solar Orbs</button>
+  <button class="tab" data-tab="mix">Compositor</button>
+</div>
+
+<div class="workspace">
+  <div class="preview">
+    <canvas id="mainCanvas" width="1920" height="1080"></canvas>
+  </div>
+  <div class="controls">
+    <div class="controls-scroll" id="controlsContent"></div>
+    <div class="controls-actions">
+      <button class="btn" id="btnRandom" title="Randomize">Randomize</button>
+      <button class="btn btn-accent" id="btnExport" title="Export PNG">Export PNG</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   CORE STATE & UTILITIES
+   ════════════════════════════════════════ */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const canvas = $('#mainCanvas');
+let ctx = canvas.getContext('2d');
+let W = 1920, H = 1080;
+let activeTab = 'mesh';
+let animId = null;
+let params = {};
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+
+function rgbStr(hex, a=1) {
+  const {r,g,b} = hexToRgb(hex);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function lerp(a,b,t) { return a + (b - a) * t; }
+function rand(min,max) { return Math.random() * (max - min) + min; }
+function randInt(min,max) { return Math.floor(rand(min, max+1)); }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function clamp(v,min,max) { return Math.max(min, Math.min(max, v)); }
+
+/* ── Brand Palette (moodboard-matched: hotter, more saturated) ── */
+const PALETTE = {
+  ember:'#AA1800', crimson:'#CC2200', coral:'#FF4400', tangerine:'#FF6600',
+  orange:'#FF8800', peach:'#FFAA44', amber:'#FFBB33', honey:'#FFCC55', cream:'#FFE8CC',
+  deepRed:'#660000', hotRed:'#EE1100',
+  deepBlue:'#001133', navy:'#001A44', ocean:'#003366', teal:'#008888', cyan:'#00CCDD',
+  neonGreen:'#00FF88', magenta:'#CC0066', pink:'#FF3388',
+  black:'#000000', nearBlack:'#0A0A0A', dark:'#111111', graphite:'#1A1A1E'
+};
+const WARM = [PALETTE.deepRed, PALETTE.ember, PALETTE.crimson, PALETTE.coral, PALETTE.tangerine, PALETTE.orange, PALETTE.peach, PALETTE.amber, PALETTE.honey, PALETTE.cream];
+
+/* ── Mesh Gradient Presets (moodboard-matched) ── */
+const MESH_PRESETS = [
+  { name:'Liquid Fire',   colors:['#FF4400','#FF6600','#FF8800','#CC2200'], bg:'#000000' },
+  { name:'Hot Ember',     colors:['#FF5500','#FFAA33','#AA1800','#FF3300'], bg:'#000000' },
+  { name:'Sunset Glow',   colors:['#FF4400','#FFBB33','#FF6600','#660000'], bg:'#000000' },
+  { name:'Orange+Navy',   colors:['#FF5500','#003366','#FF8800','#001133'], bg:'#000000' },
+  { name:'Lava Flow',     colors:['#EE1100','#FF4400','#FF6600','#880000'], bg:'#000000' },
+  { name:'Warm Swirl',    colors:['#FF6600','#FFCC55','#FF4400','#CC2200'], bg:'#050000' },
+  { name:'Neon Clash',    colors:['#FF4400','#00FF88','#FF6600','#003366'], bg:'#000000' },
+  { name:'Teal+Fire',     colors:['#008888','#FF5500','#00CCDD','#FF3300'], bg:'#000000' },
+  { name:'Magenta Burn',  colors:['#FF4400','#CC0066','#FF8800','#FF3388'], bg:'#000000' },
+];
+
+/* ════════════════════════════════════════
+   GENERATOR: MESH GRADIENT
+   ════════════════════════════════════════ */
+const meshDefaults = () => ({
+  colors: ['#FF4400','#FF6600','#FF8800','#CC2200'],
+  bg: '#000000',
+  speed: 20,
+  blobSize: 80,
+  intensity: 90,
+  animate: true,
+  vignette: 30,
+});
+
+// Asymmetric blobs — positioned off-center with varied sizes for contrast
+const BLOBS = [
+  { cx:0.25, cy:0.30, sx:0.05, sy:0.035, px:0.0, py:2.1, sz:0.8 },
+  { cx:0.75, cy:0.55, sx:0.04, sy:0.06, px:1.3, py:0.8, sz:0.7 },
+  { cx:0.40, cy:0.75, sx:0.035, sy:0.045, px:2.5, py:3.2, sz:0.6 },
+  { cx:0.85, cy:0.20, sx:0.06, sy:0.03, px:3.7, py:1.5, sz:0.5 },
+];
+
+function renderMesh(time) {
+  const p = params;
+  ctx.fillStyle = p.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const spd = p.speed / 1000;
+  const scale = p.blobSize / 100;
+  const intensity = p.intensity / 100;
+  const t = time * spd;
+
+  // Render each blob with source-over blending
+  // Lower alpha per blob = visible color zones with dark gaps
+  for (let i = 0; i < BLOBS.length; i++) {
+    const b = BLOBS[i];
+    const col = p.colors[i % p.colors.length];
+    const {r,g,b:bl} = hexToRgb(col);
+
+    // Lissajous movement for organic flow
+    const x = W * (b.cx + Math.sin(t * b.sx + b.px) * 0.18 + Math.sin(t * b.sx * 0.6 + b.py) * 0.08);
+    const y = H * (b.cy + Math.cos(t * b.sy + b.py) * 0.18 + Math.cos(t * b.sy * 0.5 + b.px) * 0.08);
+    const rad = Math.max(W, H) * b.sz * scale;
+
+    // Each blob: saturated solid core → fast falloff to transparent
+    // This creates distinct color zones with dark space between them
+    const alpha = intensity * 0.85;
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, rad);
+    grd.addColorStop(0, `rgba(${r},${g},${bl},${alpha})`);
+    grd.addColorStop(0.2, `rgba(${r},${g},${bl},${alpha * 0.85})`);
+    grd.addColorStop(0.45, `rgba(${r},${g},${bl},${alpha * 0.45})`);
+    grd.addColorStop(0.7, `rgba(${r},${g},${bl},${alpha * 0.12})`);
+    grd.addColorStop(1, `rgba(${r},${g},${bl},0)`);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Second pass: screen-blend a bright accent layer for luminosity in overlap zones
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < Math.min(2, BLOBS.length); i++) {
+    const b = BLOBS[i];
+    const col = p.colors[i % p.colors.length];
+    const {r,g,b:bl} = hexToRgb(col);
+    const x = W * (b.cx + Math.sin(t * b.sx + b.px) * 0.18 + Math.sin(t * b.sx * 0.6 + b.py) * 0.08);
+    const y = H * (b.cy + Math.cos(t * b.sy + b.py) * 0.18 + Math.cos(t * b.sy * 0.5 + b.px) * 0.08);
+    const rad = Math.max(W, H) * b.sz * scale * 0.5;
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, rad);
+    grd.addColorStop(0, `rgba(${Math.min(r+40,255)},${Math.min(g+30,255)},${Math.min(bl+20,255)},0.25)`);
+    grd.addColorStop(0.5, `rgba(${r},${g},${bl},0.08)`);
+    grd.addColorStop(1, `rgba(${r},${g},${bl},0)`);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+
+  // Vignette
+  if (p.vignette > 0) {
+    const vig = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.2, W/2, H/2, Math.max(W,H)*0.75);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, `rgba(0,0,0,${p.vignette/100})`);
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+function randomizeMesh() {
+  const preset = pick(MESH_PRESETS);
+  params.colors = [...preset.colors];
+  params.bg = '#000000';
+  params.speed = randInt(8, 35);
+  params.blobSize = randInt(65, 100);
+  params.intensity = randInt(70, 100);
+  params.vignette = randInt(10, 50);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: RIBBED GLASS
+   ════════════════════════════════════════ */
+const glassDefaults = () => ({
+  scale: 32,
+  opacity: 50,
+  direction: 'vertical',
+  prismStrength: 60,
+  bgColor1: '#FF5500',
+  bgColor2: '#000000',
+  bgColor3: '#FF8800',
+  bgAngle: 150,
+});
+
+function renderGlass(time) {
+  const p = params;
+
+  // First render the background gradient to an offscreen canvas
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const octx = off.getContext('2d');
+
+  const angle = p.bgAngle * Math.PI / 180;
+  const dx = Math.cos(angle), dy = Math.sin(angle);
+  const bgGrd = octx.createLinearGradient(W/2 - dx*W/2, H/2 - dy*H/2, W/2 + dx*W/2, H/2 + dy*H/2);
+  bgGrd.addColorStop(0, p.bgColor1);
+  bgGrd.addColorStop(0.5, p.bgColor3);
+  bgGrd.addColorStop(1, p.bgColor2);
+  octx.fillStyle = bgGrd;
+  octx.fillRect(0, 0, W, H);
+
+  // Draw the base gradient
+  ctx.drawImage(off, 0, 0);
+
+  // Prismatic ribbed glass overlay — simulate refraction by drawing
+  // shifted slices of the background with color tinting
+  const step = p.scale;
+  const prism = p.prismStrength / 100;
+  const alpha = p.opacity / 100;
+
+  ctx.save();
+  if (p.direction === 'diagonal') {
+    ctx.translate(W/2, H/2);
+    ctx.rotate(Math.PI / 7);
+    ctx.translate(-W, -H);
+  } else if (p.direction === 'horizontal') {
+    ctx.translate(W/2, H/2);
+    ctx.rotate(Math.PI / 2);
+    ctx.translate(-H/2, -W/2);
+  }
+
+  const totalW = p.direction === 'diagonal' ? Math.sqrt(W*W+H*H)*1.5 : (p.direction === 'horizontal' ? H : W);
+  const totalH = p.direction === 'diagonal' ? Math.sqrt(W*W+H*H)*1.5 : (p.direction === 'horizontal' ? W : H);
+
+  for (let x = 0; x < totalW + step; x += step) {
+    const t = (x / totalW); // 0-1 position
+    const ribW = step * 0.55;
+
+    // Prismatic color shift — each rib tints the light differently
+    const hue = (t * 360 + 180) % 360;
+    const shift = Math.sin(t * Math.PI * 6) * prism;
+
+    // Bright highlight rib
+    const highlightGrd = ctx.createLinearGradient(x, 0, x + ribW, 0);
+    highlightGrd.addColorStop(0, `rgba(255,255,255,0)`);
+    highlightGrd.addColorStop(0.15, `rgba(255,255,255,${alpha * 0.05})`);
+    highlightGrd.addColorStop(0.35, `rgba(255,255,255,${alpha * 0.25})`);
+    highlightGrd.addColorStop(0.5, `rgba(255,255,255,${alpha * 0.35})`);
+    highlightGrd.addColorStop(0.65, `rgba(255,255,255,${alpha * 0.25})`);
+    highlightGrd.addColorStop(0.85, `rgba(255,255,255,${alpha * 0.05})`);
+    highlightGrd.addColorStop(1, `rgba(255,255,255,0)`);
+    ctx.fillStyle = highlightGrd;
+    ctx.fillRect(x, -totalH, ribW, totalH * 3);
+
+    // Dark gap between ribs
+    const gapX = x + ribW;
+    const gapW = step - ribW;
+    ctx.fillStyle = `rgba(0,0,0,${alpha * 0.3})`;
+    ctx.fillRect(gapX, -totalH, gapW * 0.4, totalH * 3);
+
+    // Prismatic color tint on some ribs
+    if (prism > 0 && Math.sin(t * Math.PI * 8) > 0) {
+      const pr = Math.sin(t * Math.PI * 3) * 0.5 + 0.5;
+      const pg = Math.sin(t * Math.PI * 3 + 2) * 0.5 + 0.5;
+      const pb = Math.sin(t * Math.PI * 3 + 4) * 0.5 + 0.5;
+      const prismGrd = ctx.createLinearGradient(x, 0, x + ribW, 0);
+      prismGrd.addColorStop(0, `rgba(${Math.round(pr*255)},${Math.round(pg*150)},${Math.round(pb*255)},0)`);
+      prismGrd.addColorStop(0.5, `rgba(${Math.round(pr*255)},${Math.round(pg*150)},${Math.round(pb*255)},${prism * alpha * 0.15})`);
+      prismGrd.addColorStop(1, `rgba(${Math.round(pr*255)},${Math.round(pg*150)},${Math.round(pb*255)},0)`);
+      ctx.fillStyle = prismGrd;
+      ctx.fillRect(x, -totalH, ribW, totalH * 3);
+    }
+  }
+  ctx.restore();
+}
+
+function randomizeGlass() {
+  params.scale = randInt(16, 48);
+  params.opacity = randInt(30, 70);
+  params.direction = pick(['vertical','vertical','diagonal']);
+  params.prismStrength = randInt(20, 80);
+  params.bgColor1 = pick([PALETTE.coral, PALETTE.tangerine, PALETTE.orange, PALETTE.crimson, PALETTE.hotRed]);
+  params.bgColor2 = pick([PALETTE.black, PALETTE.nearBlack, PALETTE.deepBlue]);
+  params.bgColor3 = pick([PALETTE.orange, PALETTE.amber, PALETTE.tangerine, PALETTE.teal, PALETTE.cyan]);
+  params.bgAngle = randInt(90, 200);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: FILM GRAIN
+   ════════════════════════════════════════ */
+const grainDefaults = () => ({
+  intensity: 4,
+  monochrome: true,
+  animate: true,
+  speed: 30,
+  bgColor1: '#111113',
+  bgColor2: '#1A1A1E',
+});
+
+function renderGrain(time) {
+  const p = params;
+  // Background
+  const bgGrd = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrd.addColorStop(0, p.bgColor1);
+  bgGrd.addColorStop(1, p.bgColor2);
+  ctx.fillStyle = bgGrd;
+  ctx.fillRect(0, 0, W, H);
+  // Grain — use a smaller buffer for performance then scale up
+  const sw = Math.min(W, 480), sh = Math.min(H, 270);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = sw; offscreen.height = sh;
+  const octx = offscreen.getContext('2d');
+  const imgData = octx.createImageData(sw, sh);
+  const d = imgData.data;
+  const intensity = p.intensity / 100 * 255;
+  const seed = p.animate ? time * 0.001 : 0;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() - 0.5) * intensity;
+    if (p.monochrome) {
+      d[i] = 128 + n; d[i+1] = 128 + n; d[i+2] = 128 + n;
+    } else {
+      d[i] = 128 + n * 1.3; d[i+1] = 128 + n * 0.9; d[i+2] = 128 + n * 0.7;
+    }
+    d[i+3] = Math.abs(n) * 2;
+  }
+  octx.putImageData(imgData, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(offscreen, 0, 0, W, H);
+  ctx.imageSmoothingEnabled = true;
+}
+
+function randomizeGrain() {
+  params.intensity = randInt(2, 8);
+  params.monochrome = Math.random() > 0.3;
+  params.bgColor1 = pick([PALETTE.black, PALETTE.dark, PALETTE.graphite, '#0A0510']);
+  params.bgColor2 = pick([PALETTE.dark, PALETTE.graphite, '#1A1020']);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: HALFTONE DOTS
+   ════════════════════════════════════════ */
+const halftoneDefaults = () => ({
+  dotSize: 8,
+  spacing: 16,
+  angle: 15,
+  color: '#E85D2A',
+  fadeType: 'radial',
+  bgColor1: '#0A0A0B',
+  bgColor2: '#1A1A1E',
+  bgGradient: true,
+});
+
+function renderHalftone(time) {
+  const p = params;
+  // Background
+  if (p.bgGradient) {
+    const bgGrd = ctx.createLinearGradient(0, 0, W, H);
+    bgGrd.addColorStop(0, p.bgColor1);
+    bgGrd.addColorStop(1, p.bgColor2);
+    ctx.fillStyle = bgGrd;
+  } else {
+    ctx.fillStyle = p.bgColor1;
+  }
+  ctx.fillRect(0, 0, W, H);
+  // Dots
+  ctx.save();
+  ctx.translate(W/2, H/2);
+  ctx.rotate(p.angle * Math.PI / 180);
+  ctx.translate(-W/2, -H/2);
+  const {r,g,b} = hexToRgb(p.color);
+  const maxR = p.dotSize;
+  const step = p.spacing;
+  const cx = W/2, cy = H/2;
+  const maxDist = Math.sqrt(cx*cx + cy*cy);
+  for (let x = -step; x < W + step * 2; x += step) {
+    for (let y = -step; y < H + step * 2; y += step) {
+      let sizeFactor = 1;
+      if (p.fadeType === 'radial') {
+        const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+        sizeFactor = 1 - (dist / maxDist) * 0.8;
+      } else if (p.fadeType === 'linear') {
+        sizeFactor = 1 - (y / H) * 0.8;
+      }
+      sizeFactor = clamp(sizeFactor, 0.1, 1);
+      const dotR = maxR * sizeFactor;
+      const alpha = 0.3 + sizeFactor * 0.7;
+      ctx.beginPath();
+      ctx.arc(x, y, dotR, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function randomizeHalftone() {
+  params.dotSize = randInt(3, 14);
+  params.spacing = params.dotSize * randInt(2, 4);
+  params.angle = randInt(0, 45);
+  params.color = pick(WARM);
+  params.fadeType = pick(['radial','linear','none']);
+  params.bgColor1 = pick([PALETTE.black, PALETTE.dark, PALETTE.deepBlue]);
+  params.bgColor2 = pick([PALETTE.graphite, PALETTE.dark, '#0A0A1A']);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: CHROME / METALLIC
+   ════════════════════════════════════════ */
+const chromeDefaults = () => ({
+  topColor: '#660000',
+  midColor1: '#FF4400',
+  midColor2: '#FF8800',
+  bottomColor: '#000000',
+  horizonPos: 50,
+  glowStrength: 60,
+  sharpness: 40,
+  scanLines: false,
+});
+
+function renderChrome(time) {
+  const p = params;
+  const horizonY = H * (p.horizonPos / 100);
+  const sharp = p.sharpness / 100;
+
+  // Main sunset gradient — sharp color bands like the moodboard
+  const grd = ctx.createLinearGradient(0, 0, 0, H);
+
+  // Top: deep dark/red
+  grd.addColorStop(0, p.topColor);
+  // Transition zone — sharper = more abrupt color change
+  const spread = 0.3 * (1 - sharp);
+  const hNorm = horizonY / H;
+  grd.addColorStop(Math.max(0, hNorm - spread * 0.6), p.topColor);
+  grd.addColorStop(Math.max(0, hNorm - spread * 0.2), p.midColor1);
+  grd.addColorStop(hNorm, p.midColor2);
+  grd.addColorStop(Math.min(1, hNorm + spread * 0.3), p.midColor2);
+  grd.addColorStop(Math.min(1, hNorm + spread * 0.8), p.bottomColor);
+  grd.addColorStop(1, p.bottomColor);
+
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // Horizon glow — bright light source at horizon line
+  if (p.glowStrength > 0) {
+    const {r,g,b} = hexToRgb(p.midColor2);
+    const glowAlpha = p.glowStrength / 100;
+
+    // Horizontal glow band
+    ctx.globalCompositeOperation = 'screen';
+    const glowGrd = ctx.createRadialGradient(W/2, horizonY, 0, W/2, horizonY, W * 0.6);
+    glowGrd.addColorStop(0, `rgba(${Math.min(r+80,255)},${Math.min(g+60,255)},${Math.min(b+40,255)},${glowAlpha * 0.6})`);
+    glowGrd.addColorStop(0.3, `rgba(${r},${g},${b},${glowAlpha * 0.3})`);
+    glowGrd.addColorStop(0.7, `rgba(${r},${g},${b},${glowAlpha * 0.05})`);
+    glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glowGrd;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Optional scan lines
+  if (p.scanLines) {
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    for (let y = 0; y < H; y += 3) {
+      ctx.fillRect(0, y, W, 1);
+    }
+  }
+}
+
+function randomizeChrome() {
+  params.topColor = pick([PALETTE.deepRed, '#330000', '#220011', PALETTE.black, PALETTE.deepBlue]);
+  params.midColor1 = pick([PALETTE.coral, PALETTE.crimson, PALETTE.hotRed, '#FF3300']);
+  params.midColor2 = pick([PALETTE.tangerine, PALETTE.orange, PALETTE.amber, '#FFAA00', '#FF6600']);
+  params.bottomColor = pick([PALETTE.black, '#050000', PALETTE.deepBlue, '#000011']);
+  params.horizonPos = randInt(30, 70);
+  params.glowStrength = randInt(30, 80);
+  params.sharpness = randInt(20, 80);
+  params.scanLines = Math.random() > 0.7;
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: COLOR BAND STACKS
+   ════════════════════════════════════════ */
+const bandsDefaults = () => ({
+  bandCount: 8,
+  blurAmount: 10,
+  orientation: 'horizontal',
+  colorRange: 'full',
+  randomHeights: false,
+  gap: 0,
+});
+
+function renderBands(time) {
+  const p = params;
+  let colors;
+  if (p.colorRange === 'full') colors = [...WARM];
+  else if (p.colorRange === 'warm') colors = WARM.slice(0, 5);
+  else colors = WARM.slice(3);
+  // Repeat colors to fill band count
+  while (colors.length < p.bandCount) colors = colors.concat(colors);
+  colors = colors.slice(0, p.bandCount);
+  if (p.orientation === 'horizontal') {
+    const totalGap = p.gap * (p.bandCount - 1);
+    const availH = H - totalGap;
+    for (let i = 0; i < p.bandCount; i++) {
+      let bandH;
+      if (p.randomHeights) {
+        bandH = availH / p.bandCount * (0.5 + Math.sin(i * 2.3 + 0.7) * 0.5 + 0.5);
+      } else {
+        bandH = availH / p.bandCount;
+      }
+      const y = (availH / p.bandCount + p.gap) * i;
+      // Gradient within each band for depth
+      const grd = ctx.createLinearGradient(0, y, 0, y + bandH);
+      const {r,g,b} = hexToRgb(colors[i]);
+      grd.addColorStop(0, `rgba(${r},${g},${b},1)`);
+      grd.addColorStop(0.5, `rgba(${Math.min(r+20,255)},${Math.min(g+20,255)},${Math.min(b+20,255)},1)`);
+      grd.addColorStop(1, `rgba(${r},${g},${b},1)`);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, y, W, bandH);
+    }
+  } else {
+    const totalGap = p.gap * (p.bandCount - 1);
+    const availW = W - totalGap;
+    for (let i = 0; i < p.bandCount; i++) {
+      const bandW = availW / p.bandCount;
+      const x = (bandW + p.gap) * i;
+      const grd = ctx.createLinearGradient(x, 0, x + bandW, 0);
+      const {r,g,b} = hexToRgb(colors[i]);
+      grd.addColorStop(0, `rgba(${r},${g},${b},1)`);
+      grd.addColorStop(0.5, `rgba(${Math.min(r+20,255)},${Math.min(g+20,255)},${Math.min(b+20,255)},1)`);
+      grd.addColorStop(1, `rgba(${r},${g},${b},1)`);
+      ctx.fillStyle = grd;
+      ctx.fillRect(x, 0, bandW, H);
+    }
+  }
+  // Soft blur effect
+  if (p.blurAmount > 0) {
+    ctx.globalAlpha = 0.15;
+    for (let i = 1; i <= Math.min(p.blurAmount, 6); i++) {
+      if (p.orientation === 'horizontal') {
+        ctx.drawImage(canvas, 0, i * 3);
+        ctx.drawImage(canvas, 0, -i * 3);
+      } else {
+        ctx.drawImage(canvas, i * 3, 0);
+        ctx.drawImage(canvas, -i * 3, 0);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+function randomizeBands() {
+  params.bandCount = randInt(4, 10);
+  params.blurAmount = randInt(0, 15);
+  params.orientation = pick(['horizontal','horizontal','vertical']);
+  params.colorRange = pick(['full','warm','warm']);
+  params.randomHeights = Math.random() > 0.5;
+  params.gap = randInt(0, 6);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: WAVY LINES
+   ════════════════════════════════════════ */
+const wavesDefaults = () => ({
+  lineCount: 12,
+  amplitude: 80,
+  frequency: 2,
+  strokeWidth: 3,
+  color: '#FF5500',
+  animate: true,
+  speed: 20,
+  bgColor: '#000000',
+  colorSpread: true,
+});
+
+function renderWaves(time) {
+  const p = params;
+  ctx.fillStyle = p.bgColor;
+  ctx.fillRect(0, 0, W, H);
+  const t = p.animate ? time * p.speed / 1000 : 0;
+  const gap = H / (p.lineCount + 1);
+  for (let i = 0; i < p.lineCount; i++) {
+    const baseY = gap * (i + 1);
+    ctx.beginPath();
+    let col;
+    if (p.colorSpread) {
+      const idx = Math.floor((i / p.lineCount) * WARM.length);
+      col = WARM[clamp(idx, 0, WARM.length - 1)];
+    } else {
+      col = p.color;
+    }
+    const {r,g,b} = hexToRgb(col);
+    const alpha = 0.4 + (i / p.lineCount) * 0.6;
+    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.lineWidth = p.strokeWidth;
+    ctx.lineCap = 'round';
+    for (let x = 0; x <= W; x += 4) {
+      const phase = i * 0.5 + t;
+      const y = baseY + Math.sin(x / W * Math.PI * p.frequency * 2 + phase) * p.amplitude;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+function randomizeWaves() {
+  params.lineCount = randInt(6, 24);
+  params.amplitude = randInt(30, 150);
+  params.frequency = rand(1, 5);
+  params.strokeWidth = rand(1, 6);
+  params.color = pick([PALETTE.coral, PALETTE.tangerine, PALETTE.orange, '#FF5500']);
+  params.speed = randInt(10, 50);
+  params.colorSpread = Math.random() > 0.3;
+  params.bgColor = pick([PALETTE.black, PALETTE.nearBlack, PALETTE.deepBlue]);
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: SOLAR ORBS
+   ════════════════════════════════════════ */
+const orbsDefaults = () => ({
+  orbCount: 1,
+  maxSize: 300,
+  glowIntensity: 85,
+  color: '#FF5500',
+  scanLines: false,
+  animate: true,
+  speed: 8,
+  bgColor: '#000000',
+  glowColor: '#FF3300',
+  hotCore: true,
+});
+let orbPositions = [];
+
+function initOrbs() {
+  orbPositions = [];
+  for (let i = 0; i < 10; i++) {
+    orbPositions.push({
+      x: rand(0.2, 0.8), y: rand(0.2, 0.8),
+      sx: rand(0.01, 0.04), sy: rand(0.01, 0.04),
+      px: rand(0, Math.PI*2), py: rand(0, Math.PI*2),
+      size: rand(0.7, 1.3),
+    });
+  }
+}
+initOrbs();
+
+function renderOrbs(time) {
+  const p = params;
+  ctx.fillStyle = p.bgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const t = p.animate ? time * p.speed / 1000 : 0;
+
+  for (let i = 0; i < p.orbCount; i++) {
+    const orb = orbPositions[i];
+    const x = W * (orb.x + Math.sin(t * orb.sx + orb.px) * 0.05);
+    const y = H * (orb.y + Math.cos(t * orb.sy + orb.py) * 0.05);
+    const size = p.maxSize * orb.size;
+    const {r,g,b} = hexToRgb(p.color);
+    const {r:gr,g:gg,b:gb} = hexToRgb(p.glowColor);
+    const alpha = p.glowIntensity / 100;
+
+    // Wide atmospheric glow
+    ctx.globalCompositeOperation = 'screen';
+    const outerGrd = ctx.createRadialGradient(x, y, size * 0.5, x, y, size * 4);
+    outerGrd.addColorStop(0, `rgba(${gr},${gg},${gb},${alpha * 0.4})`);
+    outerGrd.addColorStop(0.3, `rgba(${gr},${gg},${gb},${alpha * 0.15})`);
+    outerGrd.addColorStop(0.6, `rgba(${gr},${gg},${gb},${alpha * 0.04})`);
+    outerGrd.addColorStop(1, `rgba(${gr},${gg},${gb},0)`);
+    ctx.fillStyle = outerGrd;
+    ctx.fillRect(0, 0, W, H);
+
+    // Defined sphere with sharp-ish edge
+    ctx.globalCompositeOperation = 'source-over';
+    const sphereGrd = ctx.createRadialGradient(x - size*0.2, y - size*0.2, 0, x, y, size);
+    if (p.hotCore) {
+      sphereGrd.addColorStop(0, `rgba(255,${Math.min(g+120,255)},${Math.min(b+80,255)},${alpha})`);
+      sphereGrd.addColorStop(0.3, `rgba(${Math.min(r+40,255)},${Math.min(g+40,255)},${b},${alpha})`);
+    } else {
+      sphereGrd.addColorStop(0, `rgba(${r},${g},${b},${alpha})`);
+      sphereGrd.addColorStop(0.3, `rgba(${r},${g},${b},${alpha * 0.9})`);
+    }
+    sphereGrd.addColorStop(0.7, `rgba(${r},${g},${b},${alpha * 0.85})`);
+    sphereGrd.addColorStop(0.92, `rgba(${Math.round(r*0.6)},${Math.round(g*0.4)},${Math.round(b*0.3)},${alpha * 0.7})`);
+    sphereGrd.addColorStop(0.97, `rgba(${Math.round(r*0.3)},${Math.round(g*0.2)},${Math.round(b*0.1)},${alpha * 0.3})`);
+    sphereGrd.addColorStop(1, `rgba(0,0,0,0)`);
+    ctx.fillStyle = sphereGrd;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Scan lines overlay on sphere
+    if (p.scanLines) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.clip();
+      const lineGap = 4;
+      ctx.fillStyle = `rgba(0,0,0,0.3)`;
+      for (let ly = y - size; ly < y + size; ly += lineGap) {
+        ctx.fillRect(x - size, ly, size * 2, 1.5);
+      }
+      ctx.restore();
+    }
+
+    // Rim light at bottom edge
+    ctx.globalCompositeOperation = 'screen';
+    const rimGrd = ctx.createRadialGradient(x, y + size * 0.4, size * 0.6, x, y + size * 0.4, size * 1.1);
+    rimGrd.addColorStop(0, 'rgba(0,0,0,0)');
+    rimGrd.addColorStop(0.8, 'rgba(0,0,0,0)');
+    rimGrd.addColorStop(0.95, `rgba(${r},${Math.round(g*0.5)},0,${alpha * 0.2})`);
+    rimGrd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rimGrd;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+}
+
+function randomizeOrbs() {
+  params.orbCount = pick([1, 1, 2, 3]);
+  params.maxSize = randInt(150, 450);
+  params.glowIntensity = randInt(60, 100);
+  params.color = pick([PALETTE.coral, PALETTE.tangerine, PALETTE.orange, PALETTE.crimson, '#FF5500']);
+  params.glowColor = pick([PALETTE.crimson, PALETTE.coral, '#FF2200', '#FF4400']);
+  params.scanLines = Math.random() > 0.6;
+  params.speed = randInt(3, 15);
+  params.bgColor = '#000000';
+  params.hotCore = Math.random() > 0.3;
+  initOrbs();
+}
+
+/* ════════════════════════════════════════
+   GENERATOR: COMPOSITOR
+   ════════════════════════════════════════ */
+const mixDefaults = () => ({
+  layers: [
+    { type:'mesh', enabled:true, opacity:100, blend:'source-over' },
+    { type:'glass', enabled:false, opacity:40, blend:'screen' },
+    { type:'grain', enabled:false, opacity:30, blend:'overlay' },
+    { type:'halftone', enabled:false, opacity:50, blend:'screen' },
+    { type:'orbs', enabled:false, opacity:60, blend:'lighter' },
+  ],
+  bgColor: '#0A0A0B',
+});
+
+const BLEND_MODES = ['source-over','screen','multiply','overlay','lighter','color-dodge','soft-light','hard-light'];
+
+//Compositor: render each layer to offscreen canvas, then composite
+function renderMixV2(time) {
+  const p = params;
+  const mainCtx = canvas.getContext('2d');
+  mainCtx.fillStyle = p.bgColor;
+  mainCtx.fillRect(0, 0, W, H);
+
+  const savedParams = JSON.parse(JSON.stringify(params));
+
+  for (const layer of p.layers) {
+    if (!layer.enabled || layer.opacity <= 0) continue;
+
+    // Create offscreen canvas for this layer
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const offCtx = off.getContext('2d');
+
+    // Swap global ctx to offscreen
+    const realCtx = ctx;
+    ctx = offCtx;
+
+    // Use stored params for this layer type (user customizations), or defaults
+    const layerParams = storedParams[layer.type] || getDefaults(layer.type);
+    params = JSON.parse(JSON.stringify(layerParams));
+
+    // Render to offscreen
+    const renderFn = RENDERERS[layer.type];
+    if (renderFn) renderFn(time);
+
+    // Restore global ctx and params
+    ctx = realCtx;
+    params = JSON.parse(JSON.stringify(savedParams));
+
+    // Composite onto main canvas
+    ctx.globalCompositeOperation = layer.blend;
+    ctx.globalAlpha = layer.opacity / 100;
+    ctx.drawImage(off, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* ════════════════════════════════════════
+   RENDERER REGISTRY
+   ════════════════════════════════════════ */
+const RENDERERS = {
+  mesh: renderMesh,
+  glass: renderGlass,
+  grain: renderGrain,
+  halftone: renderHalftone,
+  chrome: renderChrome,
+  bands: renderBands,
+  waves: renderWaves,
+  orbs: renderOrbs,
+  mix: renderMixV2,
+};
+
+const RANDOMIZERS = {
+  mesh: randomizeMesh,
+  glass: randomizeGlass,
+  grain: randomizeGrain,
+  halftone: randomizeHalftone,
+  chrome: randomizeChrome,
+  bands: randomizeBands,
+  waves: randomizeWaves,
+  orbs: randomizeOrbs,
+};
+
+function getDefaults(type) {
+  const defaults = {
+    mesh: meshDefaults,
+    glass: glassDefaults,
+    grain: grainDefaults,
+    halftone: halftoneDefaults,
+    chrome: chromeDefaults,
+    bands: bandsDefaults,
+    waves: wavesDefaults,
+    orbs: orbsDefaults,
+    mix: mixDefaults,
+  };
+  return defaults[type] ? defaults[type]() : {};
+}
+
+/* ════════════════════════════════════════
+   STORED PARAMS PER TAB
+   ════════════════════════════════════════ */
+const storedParams = {};
+function storeParams() { storedParams[activeTab] = JSON.parse(JSON.stringify(params)); }
+function loadParams(tab) {
+  if (storedParams[tab]) {
+    params = JSON.parse(JSON.stringify(storedParams[tab]));
+  } else {
+    params = getDefaults(tab);
+  }
+}
+
+/* ════════════════════════════════════════
+   ANIMATION LOOP
+   ════════════════════════════════════════ */
+let isAnimating = false;
+
+function startAnim() {
+  if (isAnimating) return;
+  isAnimating = true;
+  function frame(time) {
+    if (!isAnimating) return;
+    const renderFn = RENDERERS[activeTab];
+    if (renderFn) renderFn(time);
+    animId = requestAnimationFrame(frame);
+  }
+  animId = requestAnimationFrame(frame);
+}
+
+function stopAnim() {
+  isAnimating = false;
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
+}
+
+function renderOnce() {
+  const renderFn = RENDERERS[activeTab];
+  if (renderFn) renderFn(performance.now());
+}
+
+function needsAnimation() {
+  if (activeTab === 'mesh') return params.animate;
+  if (activeTab === 'grain') return params.animate;
+  if (activeTab === 'waves') return params.animate;
+  if (activeTab === 'orbs') return params.animate;
+  if (activeTab === 'mix') return true; // compositor always animates if any layer animates
+  return false;
+}
+
+function updateAnimation() {
+  stopAnim();
+  if (needsAnimation()) startAnim();
+  else renderOnce();
+}
+
+/* ════════════════════════════════════════
+   UI: CONTROL BUILDERS
+   ════════════════════════════════════════ */
+const controlsEl = $('#controlsContent');
+
+function clearControls() { controlsEl.innerHTML = ''; }
+
+function addLabel(text) {
+  const el = document.createElement('div');
+  el.className = 'ctrl-group';
+  el.innerHTML = `<div class="ctrl-label" style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:10px;text-transform:none;letter-spacing:0">${text}</div>`;
+  controlsEl.appendChild(el);
+  return el;
+}
+
+function addSlider(label, key, min, max, step=1) {
+  const group = document.createElement('div');
+  group.className = 'ctrl-group';
+  group.innerHTML = `
+    <div class="ctrl-label">${label} <span class="ctrl-val" id="val-${key}">${params[key]}</span></div>
+    <input type="range" min="${min}" max="${max}" step="${step}" value="${params[key]}" id="ctrl-${key}">
+  `;
+  controlsEl.appendChild(group);
+  const input = group.querySelector('input');
+  const valEl = group.querySelector('.ctrl-val');
+  input.addEventListener('input', () => {
+    params[key] = parseFloat(input.value);
+    valEl.textContent = step < 1 ? params[key].toFixed(1) : params[key];
+    storeParams();
+    updateAnimation();
+  });
+}
+
+function addColor(label, key) {
+  const row = document.createElement('div');
+  row.className = 'color-row';
+  row.innerHTML = `<input type="color" value="${params[key]}" id="ctrl-${key}"><span>${label}</span>`;
+  controlsEl.appendChild(row);
+  row.querySelector('input').addEventListener('input', (e) => {
+    params[key] = e.target.value;
+    storeParams();
+    updateAnimation();
+  });
+}
+
+function addColorArray(label, key, count) {
+  const group = document.createElement('div');
+  group.className = 'ctrl-group';
+  group.innerHTML = `<div class="ctrl-label">${label}</div>`;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+  for (let i = 0; i < count; i++) {
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = params[key][i] || '#E85D2A';
+    input.style.cssText = 'width:36px;height:28px;border:2px solid var(--border);border-radius:4px;cursor:pointer;padding:0;background:none;-webkit-appearance:none';
+    input.addEventListener('input', () => {
+      params[key][i] = input.value;
+      storeParams();
+      updateAnimation();
+    });
+    row.appendChild(input);
+  }
+  group.appendChild(row);
+  controlsEl.appendChild(group);
+}
+
+function addToggleGroup(label, key, options) {
+  const group = document.createElement('div');
+  group.className = 'ctrl-group';
+  group.innerHTML = `<div class="ctrl-label">${label}</div>`;
+  const tg = document.createElement('div');
+  tg.className = 'toggle-group';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'toggle-btn' + (params[key] === opt.value ? ' active' : '');
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      params[key] = opt.value;
+      tg.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      storeParams();
+      updateAnimation();
+    });
+    tg.appendChild(btn);
+  });
+  group.appendChild(tg);
+  controlsEl.appendChild(group);
+}
+
+function addCheckbox(label, key) {
+  const row = document.createElement('div');
+  row.className = 'check-row';
+  row.innerHTML = `<input type="checkbox" id="ctrl-${key}" ${params[key] ? 'checked' : ''}><label for="ctrl-${key}">${label}</label>`;
+  controlsEl.appendChild(row);
+  row.querySelector('input').addEventListener('change', (e) => {
+    params[key] = e.target.checked;
+    storeParams();
+    updateAnimation();
+  });
+}
+
+function addPresetRow(presets, onSelect) {
+  const group = document.createElement('div');
+  group.className = 'ctrl-group';
+  group.innerHTML = '<div class="ctrl-label">Presets</div>';
+  const row = document.createElement('div');
+  row.className = 'presets';
+  presets.forEach((preset, i) => {
+    const swatch = document.createElement('div');
+    swatch.className = 'preset';
+    swatch.title = preset.name;
+    // Mini gradient preview
+    const colors = preset.colors || [preset.bgColor1 || '#E85D2A', preset.bgColor2 || '#0A0A0B'];
+    swatch.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1] || colors[0]})`;
+    swatch.addEventListener('click', () => {
+      onSelect(preset);
+      row.querySelectorAll('.preset').forEach(s => s.classList.remove('active'));
+      swatch.classList.add('active');
+      storeParams();
+      buildControls(activeTab); // refresh controls with new values
+      updateAnimation();
+    });
+    row.appendChild(swatch);
+  });
+  group.appendChild(row);
+  controlsEl.appendChild(group);
+}
+
+function addDivider() {
+  const div = document.createElement('div');
+  div.className = 'ctrl-divider';
+  controlsEl.appendChild(div);
+}
+
+/* ════════════════════════════════════════
+   UI: BUILD CONTROLS PER TAB
+   ════════════════════════════════════════ */
+function buildControls(tab) {
+  clearControls();
+  switch(tab) {
+    case 'mesh': buildMeshControls(); break;
+    case 'glass': buildGlassControls(); break;
+    case 'grain': buildGrainControls(); break;
+    case 'halftone': buildHalftoneControls(); break;
+    case 'chrome': buildChromeControls(); break;
+    case 'bands': buildBandsControls(); break;
+    case 'waves': buildWavesControls(); break;
+    case 'orbs': buildOrbsControls(); break;
+    case 'mix': buildMixControls(); break;
+  }
+}
+
+function buildMeshControls() {
+  addPresetRow(MESH_PRESETS, (p) => {
+    params.colors = [...p.colors];
+    params.bg = p.bg;
+  });
+  addDivider();
+  addColorArray('Colors', 'colors', 4);
+  addColor('Background', 'bg');
+  addDivider();
+  addSlider('Speed', 'speed', 0, 80);
+  addSlider('Blob Size', 'blobSize', 20, 90);
+  addSlider('Intensity', 'intensity', 20, 100);
+  addSlider('Vignette', 'vignette', 0, 80);
+  addCheckbox('Animate', 'animate');
+}
+
+function buildGlassControls() {
+  addSlider('Rib Scale', 'scale', 8, 64);
+  addSlider('Opacity', 'opacity', 10, 80);
+  addSlider('Prism Strength', 'prismStrength', 0, 100);
+  addToggleGroup('Direction', 'direction', [
+    {label:'Vertical', value:'vertical'},
+    {label:'Horizontal', value:'horizontal'},
+    {label:'Diagonal', value:'diagonal'},
+  ]);
+  addDivider();
+  addLabel('Background Gradient');
+  addColor('Color 1', 'bgColor1');
+  addColor('Color 2 (mid)', 'bgColor3');
+  addColor('Color 3', 'bgColor2');
+  addSlider('Angle', 'bgAngle', 0, 360);
+}
+
+function buildGrainControls() {
+  addSlider('Intensity', 'intensity', 1, 12);
+  addCheckbox('Monochrome', 'monochrome');
+  addCheckbox('Animate', 'animate');
+  addSlider('Speed', 'speed', 5, 60);
+  addDivider();
+  addLabel('Background');
+  addColor('Color 1', 'bgColor1');
+  addColor('Color 2', 'bgColor2');
+}
+
+function buildHalftoneControls() {
+  addSlider('Dot Size', 'dotSize', 2, 20);
+  addSlider('Spacing', 'spacing', 6, 50);
+  addSlider('Angle', 'angle', 0, 90);
+  addColor('Dot Color', 'color');
+  addToggleGroup('Fade', 'fadeType', [
+    {label:'Radial', value:'radial'},
+    {label:'Linear', value:'linear'},
+    {label:'None', value:'none'},
+  ]);
+  addDivider();
+  addLabel('Background');
+  addColor('Color 1', 'bgColor1');
+  addColor('Color 2', 'bgColor2');
+  addCheckbox('Gradient BG', 'bgGradient');
+}
+
+function buildChromeControls() {
+  addColor('Top Color', 'topColor');
+  addColor('Mid Color 1', 'midColor1');
+  addColor('Mid Color 2', 'midColor2');
+  addColor('Bottom Color', 'bottomColor');
+  addDivider();
+  addSlider('Horizon Position', 'horizonPos', 15, 85);
+  addSlider('Glow Strength', 'glowStrength', 0, 100);
+  addSlider('Sharpness', 'sharpness', 0, 100);
+  addCheckbox('Scan Lines', 'scanLines');
+}
+
+function buildBandsControls() {
+  addSlider('Band Count', 'bandCount', 3, 16);
+  addSlider('Blur', 'blurAmount', 0, 25);
+  addSlider('Gap', 'gap', 0, 20);
+  addToggleGroup('Orientation', 'orientation', [
+    {label:'Horizontal', value:'horizontal'},
+    {label:'Vertical', value:'vertical'},
+  ]);
+  addToggleGroup('Color Range', 'colorRange', [
+    {label:'Full', value:'full'},
+    {label:'Warm', value:'warm'},
+    {label:'Light', value:'light'},
+  ]);
+  addCheckbox('Random Heights', 'randomHeights');
+}
+
+function buildWavesControls() {
+  addSlider('Line Count', 'lineCount', 3, 30);
+  addSlider('Amplitude', 'amplitude', 10, 200);
+  addSlider('Frequency', 'frequency', 0.5, 6, 0.1);
+  addSlider('Stroke Width', 'strokeWidth', 1, 8);
+  addColor('Color', 'color');
+  addCheckbox('Color Spread', 'colorSpread');
+  addCheckbox('Animate', 'animate');
+  addSlider('Speed', 'speed', 5, 60);
+  addColor('Background', 'bgColor');
+}
+
+function buildOrbsControls() {
+  addSlider('Orb Count', 'orbCount', 1, 6);
+  addSlider('Size', 'maxSize', 80, 500);
+  addSlider('Glow Intensity', 'glowIntensity', 30, 100);
+  addColor('Sphere Color', 'color');
+  addColor('Glow Color', 'glowColor');
+  addCheckbox('Hot Core', 'hotCore');
+  addCheckbox('Scan Lines', 'scanLines');
+  addDivider();
+  addCheckbox('Animate', 'animate');
+  addSlider('Speed', 'speed', 1, 20);
+  addColor('Background', 'bgColor');
+}
+
+function buildMixControls() {
+  addLabel('Layers');
+  const LAYER_NAMES = {
+    mesh:'Mesh Gradient', glass:'Ribbed Glass', grain:'Film Grain',
+    halftone:'Halftone', orbs:'Solar Orbs',
+  };
+  params.layers.forEach((layer, i) => {
+    const item = document.createElement('div');
+    item.className = 'layer-item' + (layer.enabled ? '' : ' disabled');
+    item.innerHTML = `
+      <input type="checkbox" ${layer.enabled ? 'checked' : ''}>
+      <span class="layer-name">${LAYER_NAMES[layer.type] || layer.type}</span>
+      <input type="range" class="layer-opacity" min="0" max="100" value="${layer.opacity}" style="width:60px" title="Opacity: ${layer.opacity}%">
+      <select class="layer-blend" title="Blend mode">
+        ${BLEND_MODES.map(m => `<option value="${m}" ${layer.blend===m?'selected':''}>${m}</option>`).join('')}
+      </select>
+    `;
+    const checkbox = item.querySelector('input[type="checkbox"]');
+    const opSlider = item.querySelector('.layer-opacity');
+    const blendSel = item.querySelector('.layer-blend');
+    checkbox.addEventListener('change', () => {
+      layer.enabled = checkbox.checked;
+      item.className = 'layer-item' + (layer.enabled ? '' : ' disabled');
+      storeParams(); updateAnimation();
+    });
+    opSlider.addEventListener('input', () => {
+      layer.opacity = parseInt(opSlider.value);
+      opSlider.title = `Opacity: ${layer.opacity}%`;
+      storeParams(); updateAnimation();
+    });
+    blendSel.addEventListener('change', () => {
+      layer.blend = blendSel.value;
+      storeParams(); updateAnimation();
+    });
+    controlsEl.appendChild(item);
+  });
+  addDivider();
+  addColor('Background', 'bgColor');
+}
+
+/* ════════════════════════════════════════
+   TAB SWITCHING
+   ════════════════════════════════════════ */
+function switchTab(tab) {
+  storeParams();
+  stopAnim();
+  activeTab = tab;
+  loadParams(tab);
+  // Update tab UI
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  buildControls(tab);
+  updateAnimation();
+}
+
+/* ════════════════════════════════════════
+   CANVAS SIZE
+   ════════════════════════════════════════ */
+$('#canvasSize').addEventListener('change', (e) => {
+  const [w, h] = e.target.value.split('x').map(Number);
+  W = w; H = h;
+  canvas.width = W; canvas.height = H;
+  updateAnimation();
+});
+
+/* ════════════════════════════════════════
+   EXPORT
+   ════════════════════════════════════════ */
+$('#btnExport').addEventListener('click', () => {
+  // Make sure we have a fresh render
+  if (!isAnimating) renderOnce();
+  const link = document.createElement('a');
+  link.download = `brightbase-${activeTab}-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+/* ════════════════════════════════════════
+   RANDOMIZE
+   ════════════════════════════════════════ */
+$('#btnRandom').addEventListener('click', () => {
+  const randomizer = RANDOMIZERS[activeTab];
+  if (randomizer) {
+    randomizer();
+    storeParams();
+    buildControls(activeTab);
+    updateAnimation();
+  }
+});
+
+/* ════════════════════════════════════════
+   TAB CLICK HANDLERS
+   ════════════════════════════════════════ */
+$$('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+/* ════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════ */
+params = meshDefaults();
+buildControls('mesh');
+updateAnimation();
+
+</script>
+</body>
+</html>
